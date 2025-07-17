@@ -1,0 +1,47 @@
+# Ignore PyCharm user-specific files
+.idea/workspace.xml
+.idea/usage.statistics.xml
+.idea/shelf/
+
+# Optional: Ignore other JetBrains IDE-specific files
+.idea/**/tasks.xml
+.idea/**/dataSources/
+.idea/**/dataSources.ids
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+
+# Optional: Ignore virtual environments
+venv/
+.env/
+.envrc
+.venv/
+
+# Optional: Python cache files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Optional: Ignore logs or local test/output files
+*.log
+*.csv
+*.bmp
+*.png
+*.xml
+*.tcl
+*.iml
+
+# PyInstaller build artifacts
+build/
+dist/
+*.spec
+*.pkg
+*.pyz
+*.toc
+*.zip
+*.txt
+*.html
+
+# Python file to compare GPT output before pasting over existing files
+Change.py
