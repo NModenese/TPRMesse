@@ -2,19 +2,31 @@ import json
 import re
 
 import serial
+from serial.tools import list_ports
 
 
 class MagneticSpringSensor:
     STRUCTURE_REGEX = re.compile(r'^\{"raw":.*?,"dst":.*?,"ocf":.*?,"cof":.*?,"lin":.*?\}$')
 
-    def __init__(self, port='COM3', baudrate=115200, spring_constant=50.0):
-        self.port = port
+    def __init__(self, port=None, baudrate=115200, spring_constant=50.0):
         self.baudrate = baudrate
         self.spring_constant = spring_constant
         self.ser = None
         self.buffer = ""
         self.latest_displacement = None
+
+        self.port = port or self.auto_detect_port()
         self.connect()
+
+    @staticmethod
+    def auto_detect_port():
+        ports = list_ports.comports()
+        for p in ports:
+            # Du kannst hier nach Beschreibung filtern, z. B.:
+            if "USB" in p.description or "CH340" in p.description or "Serial" in p.description:
+                print(f"[Sensor] Auto-detected port: {p.device} ({p.description})")
+                return p.device
+        raise RuntimeError("Kein geeigneter COM-Port gefunden.")
 
     def compute_crc16(self, data: str) -> int:
         crc = 0xFFFF
