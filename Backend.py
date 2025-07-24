@@ -1,7 +1,10 @@
-import time
 import math
 import threading
+import time
 from typing import Callable
+
+from MagneticSpringSensor import MagneticSpringSensor
+
 
 class DummyPowerSupply:
     def __init__(self):
@@ -48,7 +51,7 @@ class DummySpring:
 
 
 class DummyVoltmeter:
-    def __init__(self, elevator: DummyElevator, spring: DummySpring):
+    def __init__(self, elevator: DummyElevator, spring: MagneticSpringSensor):
         self.elevator = elevator
         self.spring = spring
 
@@ -70,7 +73,8 @@ class MeasurementBackend:
     def __init__(self):
         self.dps = DummyPowerSupply()
         self.elevator = DummyElevator()
-        self.spring = DummySpring(self.elevator)
+        # self.spring = DummySpring(self.elevator)
+        self.spring = MagneticSpringSensor()
         self.voltmeter = DummyVoltmeter(self.elevator, self.spring)
         self.running = False
         self.stop_flag = threading.Event()
@@ -98,11 +102,11 @@ class MeasurementBackend:
 
                 # Live-Rückgabe an GUI
                 callback({
-                    "elevator": round(self.elevator.position, 3),
+                    "elevator"   : round(self.elevator.position, 3),
                     "compression": round(compression, 3),
-                    "voltage": round(voltage, 3),
-                    "current": round(current, 3),
-                    "resistance": round(resistance, 2) if not math.isnan(resistance) else None
+                    "voltage"    : round(voltage, 3),
+                    "current"    : round(current, 3),
+                    "resistance" : round(resistance, 2) if not math.isnan(resistance) else None
                 })
 
                 if compression >= 0.5:
@@ -117,9 +121,9 @@ class MeasurementBackend:
                 current = self.dps.readCurrent()
                 resistance = calculate_surface_resistance(voltage, current)
                 callback({
-                    "final": True,
-                    "voltage": round(voltage, 3),
-                    "current": round(current, 3),
+                    "final"     : True,
+                    "voltage"   : round(voltage, 3),
+                    "current"   : round(current, 3),
                     "resistance": round(resistance, 2) if not math.isnan(resistance) else None
                 })
 
@@ -147,3 +151,7 @@ class MeasurementBackend:
 
     def is_running(self):
         return self.running
+
+    def shutdown(self):
+        if self.spring:
+            self.spring.disconnect()

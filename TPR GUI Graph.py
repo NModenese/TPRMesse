@@ -237,6 +237,10 @@ class TPRGUI:
         for item in self.tree.get_children():
             self.tree.delete(item)
 
+    def closeEvent(self, event):
+        self.backend.shutdown()
+        event.accept()
+
 
 # Startpunkt der Anwendung
 if __name__ == "__main__":
