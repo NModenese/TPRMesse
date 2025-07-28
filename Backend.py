@@ -49,6 +49,9 @@ class DummySpring:
     def getCompression(self) -> float:
         return max(0.0, self.elevator.position - self.contact_offset)
 
+    def disconnect(self):
+        pass
+
 
 class DummyVoltmeter:
     def __init__(self, elevator: DummyElevator, spring: MagneticSpringSensor):
@@ -74,7 +77,11 @@ class MeasurementBackend:
         self.dps = DummyPowerSupply()
         self.elevator = DummyElevator()
         # self.spring = DummySpring(self.elevator)
-        self.spring = MagneticSpringSensor()
+        try:
+            self.spring = MagneticSpringSensor()
+        except Exception as e:
+            print("[Backend] Sensor nicht verfügbar – verwende DummySpring.")
+            self.spring = DummySpring(self.elevator)
         self.voltmeter = DummyVoltmeter(self.elevator, self.spring)
         self.running = False
         self.stop_flag = threading.Event()

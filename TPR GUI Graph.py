@@ -68,7 +68,8 @@ class TPRGUI:
         # Spinner und Startbutton
         top_right_controls = tk.Frame(main_top, background="#1e1e1e")
         top_right_controls.grid(row=1, column=1, sticky="e")
-        self.spinner_images = [ImageTk.PhotoImage(Image.open(f"spinner_{i}.png").resize((24, 24))) for i in range(18)]
+        self.spinner_images = [ImageTk.PhotoImage(Image.open(f"spinner/spinner_{i}.png").resize((24, 24))) for i in
+                               range(18)]
         self.empty_spinner = ImageTk.PhotoImage(Image.new("RGBA", (24, 24), (0, 0, 0, 0)))
         self.spinner_label = tk.Label(top_right_controls, image=self.empty_spinner, background="#1e1e1e")
         self.spinner_label.grid(row=0, column=0, sticky="e", pady=5)
@@ -237,14 +238,13 @@ class TPRGUI:
         for item in self.tree.get_children():
             self.tree.delete(item)
 
-    def closeEvent(self, event):
+    def close_event(self):
         self.backend.shutdown()
-        event.accept()
 
 
 # Startpunkt der Anwendung
 if __name__ == "__main__":
     root = tk.Tk()
     app = TPRGUI(root)
-    root.protocol("WM_DELETE_WINDOW", lambda: (root.destroy(), exit()))
+    root.protocol("WM_DELETE_WINDOW", lambda: (app.close_event(), root.destroy(), exit()))
     root.mainloop()

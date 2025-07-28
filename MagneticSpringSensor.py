@@ -15,20 +15,25 @@ class MagneticSpringSensor:
         self.buffer = ""
         self.latest_displacement = None
 
-        self.port = port or self.auto_detect_port()
-        self.connect()
+        try:
+            self.port = port or self.auto_detect_port()
+            self.connect()
+        except Exception as e:
+            print(f"[MagneticSpringSensor] Initialisierung fehlgeschlagen: {e}")
+            raise
 
     @staticmethod
     def auto_detect_port():
         ports = list_ports.comports()
         for p in ports:
             # Du kannst hier nach Beschreibung filtern, z. B.:
-            if "USB" in p.description or "CH340" in p.description or "Serial" in p.description:
-                print(f"[Sensor] Auto-detected port: {p.device} ({p.description})")
+            if "CH340" in p.description:
+                print(f"[MagneticSpringSensor] Auto-detected port: {p.device} ({p.description})")
                 return p.device
         raise RuntimeError("Kein geeigneter COM-Port gefunden.")
 
-    def compute_crc16(self, data: str) -> int:
+    @staticmethod
+    def compute_crc16(data: str) -> int:
         crc = 0xFFFF
         for ch in data:
             crc ^= ord(ch) << 8
@@ -53,14 +58,15 @@ class MagneticSpringSensor:
     def connect(self):
         try:
             self.ser = serial.Serial(self.port, self.baudrate, timeout=1)
-            print(f"[Sensor] Connected to {self.port}")
+            print(f"[MagneticSpringSensor] Connected to {self.port}")
         except Exception as e:
-            print(f"[Sensor] Connection failed: {e}")
+            print(f"[MagneticSpringSensor] Connection failed: {e}")
             self.ser = None
 
     def disconnect(self):
         if self.ser:
             self.ser.close()
+            print(f"[MagneticSpringSensor] Disconnected")
             self.ser = None
 
     def _read_new_value(self):
